@@ -7,12 +7,13 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 import math,random
 from django.core.mail import send_mail
+import datetime;
 #connecting python with mongodb
 client=MongoClient("mongodb+srv://test:test@cluster0-nc9ml.mongodb.net/sih?retryWrites=true&w=majority")
 db=client.get_database('sih')
 record=db.sih
 from rest_framework.decorators import api_view
-
+import hashlib 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -26,6 +27,7 @@ from io import StringIO
 import io
 
 d=os.path.dirname(os.getcwd())
+# d=os.path.join(d,"mysite")
 d=os.path.join(d,"app")
 d=os.path.join(d,"gen")
 
@@ -71,15 +73,61 @@ def signup(request):
 
 @api_view(['POST'])
 def sendEmail(request):
-    print(request.data['email'])
-    try:
-        otp=generateOTP()
-        print(request.data['email'],otp)
-        # sendEmail(request.data['email'],otp)
-        send_mail('Verificaton for signup', otp, 'sihkkr2020@gmail.com', [request.data['email']])
-        return JsonResponse({"status":otp},status=200)
-    except Exception as e:
-        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+    q=request.data
+    x=record.find_one({"_id":q['email']})
+    if(x==None):
+        try:
+            otp=generateOTP()
+            print(request.data['email'],otp)
+            # sendEmail(request.data['email'],otp)
+            send_mail('Verificaton for signup', otp, 'sihkkr2020@gmail.com', [request.data['email']])
+            return JsonResponse({"status":hashlib.md5(otp.encode()).hexdigest()},status=200)
+        except Exception as e:
+            return JsonResponse({"status": "an error occured :(","e":e},status=500)
+    else:
+        return JsonResponse({"status":'already registered'},status=200)
+
+
+@api_view(['POST'])
+def sendEmailFP(request):
+    q=request.data
+    x=record.find_one({"_id":q['email']})
+    if(x!=None):
+        try:
+            otp=generateOTP()
+            print(request.data['email'],otp)
+            # sendEmail(request.data['email'],otp)
+            send_mail('Verificaton for signup', otp, 'sihkkr2020@gmail.com', [request.data['email']])
+            return JsonResponse({"status":hashlib.md5(otp.encode()).hexdigest()},status=200)
+        except Exception as e:
+            return JsonResponse({"status": "an error occured :(","e":e},status=500)
+    else:
+        return JsonResponse({"status":'not registerd'},status=200)
+
+
+@api_view(['POST'])
+def FP(request):
+    q=request.data
+    record.update_many( {"_id":q['email']}, { "$set":{  "password":q['password']} } ) 
+    return JsonResponse({"status":'done'},status=200)
+
+
+
+@api_view(['POST'])
+def Query(request):
+    q=request.data
+    y=request.data['token']
+    y=jwt.decode(y, 'mks')
+    y1=record.find_one({"_id":y['email']})
+    z=y1['query']
+    z.append([q['msg'],q['name'],q['email'],datetime.datetime.now().timestamp()])
+    record.update_many( {"_id":y['email']}, { "$set":{  "query":z} } ) 
+    return JsonResponse({"status":'done'},status=200)
+
+
+
+
+
 @api_view(['POST'])
 def login(request):
     try:
@@ -94,6 +142,17 @@ def login(request):
             return JsonResponse({"status": "False"},status=200)
     except Exception as e:
         return JsonResponse({"status": "an error occured :(","e":e},status=500)
+
+
+
+
+
+
+
+
+
+
+
 @api_view(['POST'])
 def getUserDetails(request):
     try:
@@ -103,6 +162,14 @@ def getUserDetails(request):
         return JsonResponse({"status": "True","details":y},status=200)
     except Exception as e:
         return JsonResponse({"status": "an error occured :(","e":e},status=500)
+
+
+
+
+
+
+
+
 @api_view(['POST'])
 def mlModel(request):
     try:
@@ -110,7 +177,7 @@ def mlModel(request):
         y=jwt.decode(y, 'mks')
         y=record.find_one({"_id":y['email']})
         z=y['recent']
-        z.append([request.data['state'],request.data['city'],request.data['month']])
+        z.append([request.data['state'],request.data['city'],request.data['month'],datetime.datetime.now().timestamp()])
         print(y,z)
         record.update_many( {"_id":y['_id']}, { "$set":{  "recent":z} } ) 
         import matplotlib
