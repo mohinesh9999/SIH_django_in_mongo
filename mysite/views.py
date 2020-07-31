@@ -188,7 +188,7 @@ def mlModel(request):
         matplotlib.use('Agg')
         
         e=os.path.join(d,request.data['state'])
-        q=os.path.join(e,request.data['city'])
+        q=os.path.join(e,request.data['city'].capitalize())
         os.chdir(q)
 
         dataset = pd.read_csv(request.data['month']+".csv")
@@ -304,7 +304,7 @@ def mlModel1(request):
         matplotlib.use('Agg')
         
         e=os.path.join(d,request.data['state'])
-        q=os.path.join(e,request.data['city'])
+        q=os.path.join(e,request.data['city'].capitalize())
         os.chdir(q)
 
         dataset = pd.read_csv(request.data['month']+".csv")
