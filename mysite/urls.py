@@ -26,4 +26,6 @@ urlpatterns = [
     path('login/', login),
     path('getUserDetails/', getUserDetails),
     path('mlModel/', mlModel),
+    path('mlModel1/', mlModel1),
+    path('mlModel2/', mlModel2),
 ]

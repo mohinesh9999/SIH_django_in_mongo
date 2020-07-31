@@ -1,3 +1,4 @@
+from copy import copy
 from pymongo import MongoClient  #for mongodb
 import jwt    #for authentication
 from django.http import HttpResponse,JsonResponse
@@ -29,7 +30,9 @@ import io
 d=os.path.dirname(os.getcwd())
 # d=os.path.join(d,"mysite")
 d=os.path.join(d,"app")
-d=os.path.join(d,"gen")
+d=os.path.join(d,"sih")
+xn=d
+d=os.path.join(d,"States")
 
 
 
@@ -120,7 +123,7 @@ def Query(request):
     y=jwt.decode(y, 'mks')
     y1=record.find_one({"_id":y['email']})
     z=y1['query']
-    z.append([q['msg'],q['name'],q['email'],datetime.datetime.now().timestamp()])
+    z.append([q['msg'],q['name'],q['email'],datetime.datetime.now().isoformat()])
     record.update_many( {"_id":y['email']}, { "$set":{  "query":z} } ) 
     return JsonResponse({"status":'done'},status=200)
 
@@ -172,64 +175,100 @@ def getUserDetails(request):
 
 @api_view(['POST'])
 def mlModel(request):
+    global d,xn
     try:
         y=request.data['token']
         y=jwt.decode(y, 'mks')
         y=record.find_one({"_id":y['email']})
         z=y['recent']
-        z.append([request.data['state'],request.data['city'],request.data['month'],datetime.datetime.now().timestamp()])
+        z.append([request.data['state'],request.data['city'],request.data['month'],datetime.datetime.now().isoformat()])
         print(y,z)
         record.update_many( {"_id":y['_id']}, { "$set":{  "recent":z} } ) 
         import matplotlib
         matplotlib.use('Agg')
         
-        x1=d
-        # f=os.path.join(d,"States")
         e=os.path.join(d,request.data['state'])
         q=os.path.join(e,request.data['city'])
-        # w=os.path.join(q,"jan")
         os.chdir(q)
 
-        dataset = pd.read_csv(request.data['month']+'.csv')
-        print(dataset)
+        dataset = pd.read_csv(request.data['month']+".csv")
         x=dataset.iloc[:,:-1].values 
         y=dataset.iloc[:,-1].values 
-        print(x1)
-        # os.chdir(x1)
-        # l=os.path.join(x1,"2020")
-        # j=os.path.join(l,"jan")
-        os.chdir(x1)
 
-        dataset2 = pd.read_csv(request.data['month']+'.csv')
+
+        l=os.path.join(xn,"year")
+        #j=os.path.join(l,"jan") 
+        os.chdir(l)
+
+        dataset2 = pd.read_csv("jan.csv")
         x2=dataset2.iloc[:,:-1].values
         #y2=dataset2.iloc[:,-1].values
 
         from sklearn.preprocessing import LabelEncoder,OneHotEncoder
-        labelencoder=LabelEncoder()
-        x[:,0]=labelencoder.fit_transform(x[:,0])
-        onehotencoder=OneHotEncoder(categorical_features=[0])
-        x=onehotencoder.fit_transform(x).toarray()
-        labelencoder=LabelEncoder()
-        x[:,-1]=labelencoder.fit_transform(x[:,-1])
-        onehotencoder1=OneHotEncoder(categorical_features=[-1])
-        x=onehotencoder1.fit_transform(x).toarray()
+        from sklearn.compose import ColumnTransformer
+
+        label_encoder_x_1 = LabelEncoder()
+        x[: , 0] = label_encoder_x_1.fit_transform(x[:,0])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [0]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
+
+        label_encoder_x_2 = LabelEncoder()
+        x[: , -1] = label_encoder_x_1.fit_transform(x[:,-1])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [-1]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
         x=x[:,1:]
 
 
-        labelencoder=LabelEncoder()
-        x2[:,0]=labelencoder.fit_transform(x2[:,0])
-        # onehotencoder=OneHotEncoder(categorical_features=[0])
-        onehotencoder=OneHotEncoder(categorical_features=[0])
-        print(onehotencoder)
-        x2=onehotencoder.fit_transform(x2).toarray()
-        labelencoder=LabelEncoder()
-        x2[:,-1]=labelencoder.fit_transform(x2[:,-1])
-        onehotencoder=OneHotEncoder(categorical_features=[-1])
-        x2=onehotencoder.fit_transform(x2).toarray()
+
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [0]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , -1] = label_encoder_x_1.fit_transform(x2[:,-1])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [-1]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
         x2=x2[:,1:]
-        '''
-        from sklearn.model_selection import train_test_split
-        x_train,x_test,y_train,y_test=train_test_split(x,y,train_size=0.8,random_state=0)'''
+
+
 
 
         from sklearn.linear_model import LinearRegression
@@ -239,7 +278,6 @@ def mlModel(request):
         y_pred=regressor.predict(x2)
         #plt.plot(y2,color='red',label='real')
         #plt.plot(y_pred,color='blue',label='pred')
-        fig = plt.figure()
         plt.title('Cotton price') 
         plt.xlabel('time')
         #plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
@@ -249,21 +287,241 @@ def mlModel(request):
         plt.plot(xi, y_pred, marker='o', linestyle='--', color='b', label='Square') 
         plt.xticks(xi, x)
         plt.legend
-        # plt.show()
-        # plt.close(fig)
-        canvas = fig.canvas
-        buf, size = canvas.print_to_buffer()
-        image = PIL.Image.frombuffer('RGBA', size, buf, 'raw', 'RGBA', 0, 1)
-        buffer=io.BytesIO()
-        image.save(buffer,'PNG')
-        graphic = buffer.getvalue()
-        graphic = base64.b64encode(graphic)
-        buffer.close()
-        a=str(graphic)
-        a=a[a.find("'")+1:a.rfind("'")]
-        print(type(y_pred))
+        plt.show()
         l=[]
         for i in y_pred:
+            l.append(i)
+        return JsonResponse({"buffer":l})
+    except Exception as e:
+        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+@api_view(['POST'])
+def mlModel1(request):
+    global d,xn
+    try:
+        y=request.data['token']
+        y=jwt.decode(y, 'mks')
+        import matplotlib
+        matplotlib.use('Agg')
+        
+        e=os.path.join(d,request.data['state'])
+        q=os.path.join(e,request.data['city'])
+        os.chdir(q)
+
+        dataset = pd.read_csv(request.data['month']+".csv")
+        x=dataset.iloc[:,:-1].values 
+        y=dataset.iloc[:,-1].values 
+
+
+        l=os.path.join(xn,"year")
+        #j=os.path.join(l,"jan") 
+        os.chdir(l)
+
+        dataset2 = pd.read_csv("jan.csv")
+        x2=dataset2.iloc[:,:-1].values
+        #y2=dataset2.iloc[:,-1].values
+
+        from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+        from sklearn.compose import ColumnTransformer
+
+        label_encoder_x_1 = LabelEncoder()
+        x[: , 0] = label_encoder_x_1.fit_transform(x[:,0])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [0]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
+
+        label_encoder_x_2 = LabelEncoder()
+        x[: , -1] = label_encoder_x_1.fit_transform(x[:,-1])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [-1]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
+        x=x[:,1:]
+
+
+
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [0]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , -1] = label_encoder_x_1.fit_transform(x2[:,-1])
+        transformer = ColumnTransformer(
+        transformers=[
+            ("OneHot",        # Just a name
+                OneHotEncoder(), # The transformer class
+                [-1]              # The column(s) to be applied on.
+                )
+        ],
+        remainder='passthrough' # donot apply anything to the remaining columns
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
+        x2=x2[:,1:]
+
+
+
+
+        from sklearn.linear_model import LinearRegression
+        regressor=LinearRegression()
+        regressor.fit(x,y)
+
+        y_pred=regressor.predict(x2)
+        #plt.plot(y2,color='red',label='real')
+        #plt.plot(y_pred,color='blue',label='pred')
+        plt.title('Cotton price') 
+        plt.xlabel('time')
+        #plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+
+        x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        xi = list(range(len(x)))
+        plt.plot(xi, y_pred, marker='o', linestyle='--', color='b', label='Square') 
+        plt.xticks(xi, x)
+        plt.legend
+        plt.show()
+        l=[]
+        for i in y_pred:
+            l.append(i)
+        return JsonResponse({"buffer":l})
+    except Exception as e:
+        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+@api_view(['POST'])
+def mlModel2(request):
+    global d,xn
+    try:
+        e=copy(d)
+        y=request.data['token']
+        y=jwt.decode(y, 'mks')
+        import matplotlib
+        matplotlib.use('Agg')
+        e=os.path.join(d,"gujarat")
+        e=os.path.join(e,"Amreli")
+        os.chdir(e)
+        dataset = pd.read_csv('real.csv')
+        # os.chdir(e)
+        dataset['Date'] = pd.to_datetime(dataset['Date'])
+        indexedDataset = dataset.set_index(['Date'])
+        indexedDataset = indexedDataset.fillna(method='ffill')
+
+
+        from datetime import datetime
+        #indexedDataset.tail(12)
+
+
+
+        rolmean = indexedDataset.rolling(window=12).mean()
+
+        rolstd = indexedDataset.rolling(window=12).std()
+        #print(rolmean,rolstd)
+
+
+
+        from statsmodels.tsa.stattools import adfuller
+
+        #print('Results of DFT: ')
+        dftest = adfuller(indexedDataset['Prices'],autolag='AIC')
+
+        dfoutput=pd.Series(dftest[0:4],index=['Test Statistic','p-val','lag used','Number of obser'])
+        
+
+        indexedDataset_logScale=np.log(indexedDataset)
+
+        movingAverage=indexedDataset_logScale.rolling(window=12).mean()
+        movingstd=indexedDataset_logScale.rolling(window=12).std()
+
+
+        datasetLogScaleMinusMovingAverage=indexedDataset_logScale-movingAverage
+        #datasetLogScaleMinusMovingAverage.head(12)
+
+        datasetLogScaleMinusMovingAverage.dropna(inplace=True)
+        #datasetLogScaleMinusMovingAverage.head(12)
+
+        from statsmodels.tsa.stattools import adfuller
+        def test_stationarity(timeseries):
+            
+            movingAverage=timeseries.rolling(window=12).mean()
+            movingSTD=timeseries.rolling(window=12).std()
+            
+            dftest=adfuller(timeseries['Prices'],autolag='AIC')
+            dfoutput=pd.Series(dftest[0:4],index=['Test stats','pval','lag','No of obser'])
+        
+
+        test_stationarity(datasetLogScaleMinusMovingAverage)
+
+        exponentialDecayWeightedAverage=indexedDataset_logScale.ewm(halflife=12,min_periods=0,adjust=True).mean()
+
+
+        datasetLogScaleMinusMovingExponentialDecayAverage=indexedDataset_logScale-exponentialDecayWeightedAverage
+        test_stationarity(datasetLogScaleMinusMovingExponentialDecayAverage)
+
+        datasetLogDiffShifting=indexedDataset_logScale - indexedDataset_logScale.shift()
+
+
+        datasetLogDiffShifting.dropna(inplace=True)
+        test_stationarity(datasetLogDiffShifting)
+
+
+
+
+
+        from statsmodels.tsa.arima_model import ARIMA
+
+        model=ARIMA(indexedDataset_logScale,order=(1,1,1))
+        results_AR=model.fit(disp=-1)
+
+
+        predictions_ARIMA_diff=pd.Series(results_AR.fittedvalues,copy=True)
+        #print(predictions_ARIMA_diff.head())
+
+        predictions_ARIMA_diff_cumsum=predictions_ARIMA_diff.cumsum()
+        #print(predictions_ARIMA_diff_cumsum.head())
+
+        predictions_ARIMA_log=pd.Series(indexedDataset_logScale['Prices'].iloc[0],index=indexedDataset_logScale.index)
+        predictions_ARIMA_log=predictions_ARIMA_log.add(predictions_ARIMA_diff_cumsum,fill_value=0)
+        #predictions_ARIMA_log.head()
+
+        predictions_ARIMA=np.exp(predictions_ARIMA_log)
+
+        #indexedDataset_logScale
+        #predictions_ARIMA
+
+        modell=ARIMA(predictions_ARIMA,order=(1,1,1))
+        results_ARM=modell.fit(disp=-1)
+
+        #results_ARM.plot_predict(1,60)
+        x=results_ARM.forecast(steps=12)
+
+
+
+        toplot=x[0][0:12]
+        print(toplot)
+        l=[]
+        for i in toplot:
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
