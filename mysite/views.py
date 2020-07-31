@@ -394,16 +394,12 @@ def mlModel1(request):
         y_pred=regressor.predict(x2)
         #plt.plot(y2,color='red',label='real')
         #plt.plot(y_pred,color='blue',label='pred')
-        plt.title('Cotton price') 
-        plt.xlabel('time')
+        # plt.title('Cotton price') 
+        # plt.xlabel('time')
         #plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
         x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         xi = list(range(len(x)))
-        plt.plot(xi, y_pred, marker='o', linestyle='--', color='b', label='Square') 
-        plt.xticks(xi, x)
-        plt.legend
-        plt.show()
         l=[]
         for i in y_pred:
             l.append(i)
