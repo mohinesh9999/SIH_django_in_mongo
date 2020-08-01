@@ -294,9 +294,9 @@ def mlModel(request):
         l=[]
         for i in y_pred:
             l.append(i)
-        return JsonResponse({"buffer":l})
+        return JsonResponse({"buffer":l,"flag":'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":False},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
 @api_view(['POST'])
 def mlModel1(request):
     global d,xn
@@ -409,9 +409,9 @@ def mlModel1(request):
         l=[]
         for i in y_pred:
             l.append(i)
-        return JsonResponse({"buffer":l})
+        return JsonResponse({"buffer":l,'flag':'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":False},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
 @api_view(['POST'])
 def mlModel2(request):
     global d,xn
@@ -525,6 +525,6 @@ def mlModel2(request):
         l=[]
         for i in toplot:
             l.append(i)
-        return JsonResponse({"buffer":l})
+        return JsonResponse({"buffer":l,'flag':'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":False},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
