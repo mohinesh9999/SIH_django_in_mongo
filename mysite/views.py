@@ -296,7 +296,7 @@ def mlModel(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": False},status=200)
+        return JsonResponse({"status": False,"flag":False},status=400)
 @api_view(['POST'])
 def mlModel1(request):
     global d,xn
@@ -411,7 +411,7 @@ def mlModel1(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": False},status=200)
+        return JsonResponse({"status": False,"flag":False},status=400)
 @api_view(['POST'])
 def mlModel2(request):
     global d,xn
@@ -527,4 +527,4 @@ def mlModel2(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": False},status=200)
+        return JsonResponse({"status": False,"flag":False},status=400)
