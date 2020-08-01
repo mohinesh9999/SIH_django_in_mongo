@@ -28,8 +28,8 @@ from io import StringIO
 import io
 
 d=os.path.dirname(os.getcwd())
-# d=os.path.join(d,"mysite")
 d=os.path.join(d,"app")
+# d=os.path.join(d,"app")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
@@ -190,8 +190,11 @@ def mlModel(request):
         e=os.path.join(d,request.data['state'])
         q=os.path.join(e,request.data['city'].capitalize())
         os.chdir(q)
-
-        dataset = pd.read_csv(request.data['month']+".csv")
+        mnth={'january': 'jan', 'february': 'feb', 'march': 'march', 
+            'april': 'april', 'may': 'may', 'june': 'jun', 'july': 'july', 
+            'august': 'august', 'september': 'sept', 'october': 'oct', 
+            'november': 'nov', 'december': 'dec'}
+        dataset = pd.read_csv(mnth[request.data['month']]+".csv")
         x=dataset.iloc[:,:-1].values 
         y=dataset.iloc[:,-1].values 
 
@@ -293,7 +296,7 @@ def mlModel(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+        return JsonResponse({"status": False},status=200)
 @api_view(['POST'])
 def mlModel1(request):
     global d,xn
@@ -306,8 +309,11 @@ def mlModel1(request):
         e=os.path.join(d,request.data['state'])
         q=os.path.join(e,request.data['city'].capitalize())
         os.chdir(q)
-
-        dataset = pd.read_csv(request.data['month']+".csv")
+        mnth={'january': 'jan', 'february': 'feb', 'march': 'march', 
+            'april': 'april', 'may': 'may', 'june': 'jun', 'july': 'july', 
+            'august': 'august', 'september': 'sept', 'october': 'oct', 
+            'november': 'nov', 'december': 'dec'}
+        dataset = pd.read_csv(mnth[request.data['month']]+".csv")
         x=dataset.iloc[:,:-1].values 
         y=dataset.iloc[:,-1].values 
 
@@ -405,7 +411,7 @@ def mlModel1(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+        return JsonResponse({"status": False},status=200)
 @api_view(['POST'])
 def mlModel2(request):
     global d,xn
@@ -415,8 +421,8 @@ def mlModel2(request):
         y=jwt.decode(y, 'mks')
         import matplotlib
         matplotlib.use('Agg')
-        e=os.path.join(d,"gujarat")
-        e=os.path.join(e,"Amreli")
+        e=os.path.join(d,request.data['state'])
+        e=os.path.join(e,request.data['city'])
         os.chdir(e)
         dataset = pd.read_csv('real.csv')
         # os.chdir(e)
@@ -521,4 +527,4 @@ def mlModel2(request):
             l.append(i)
         return JsonResponse({"buffer":l})
     except Exception as e:
-        return JsonResponse({"status": "an error occured :(","e":e},status=500)
+        return JsonResponse({"status": False},status=200)
