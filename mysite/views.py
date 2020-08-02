@@ -476,7 +476,7 @@ def mlModel2(request):
         import matplotlib
         matplotlib.use('Agg')
         e=os.path.join(d,request.data['state'])
-        e=os.path.join(e,request.data['city'])
+        e=os.path.join(e,request.data['city'].capitalize())
         os.chdir(e)
         dataset = pd.read_csv('real.csv')
         # os.chdir(e)
