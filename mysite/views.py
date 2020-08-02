@@ -29,7 +29,7 @@ import io
 
 d=os.path.dirname(os.getcwd())
 # d=os.path.join(d,"mysite")
-d=os.path.join(d,"app")
+d=os.path.join(d,"mysite")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
@@ -463,7 +463,14 @@ def mlModel1(request):
         l=[]
         for i in y_pred:
             l.append(i)
-        return JsonResponse({"buffer":l,'flag':'True'})
+        w=[]
+        msp=5550
+        for i in y_pred:
+            if(msp>=i):
+                w.append(msp)
+            else:
+                w.append(msp+0.4*(i-msp))
+        return JsonResponse({"buffer":l,'w':w,'flag':'True'})
     except Exception as e:
         return JsonResponse({"status": False,"flag":'False','e':e},status=400)
 @api_view(['POST'])
@@ -569,17 +576,22 @@ def mlModel2(request):
         modell=ARIMA(predictions_ARIMA,order=(1,1,1))
         results_ARM=modell.fit(disp=-1)
 
-        #results_ARM.plot_predict(1,60)
+        results_ARM.plot_predict(1,60)
         x=results_ARM.forecast(steps=12)
 
 
 
         toplot=x[0][0:12]
-        print(toplot)
+        print(toplot,x[2])
         l=[]
         for i in toplot:
             l.append(i)
-        return JsonResponse({"buffer":l,'flag':'True'})
+        w=[]
+        for i in x[2]:
+            i=list(i)
+            w.append([i[0],i[1]])
+        print(w)
+        return JsonResponse({"buffer":l,'flag':'True',"x":w})
     except Exception as e:
         return JsonResponse({"status": False,"flag":'False','e':e},status=400)
 
@@ -727,9 +739,12 @@ def regression(city,state,month):
         k=0
         for i in range(len(list(y_pred))):
             k+=float(y_pred[i])
-        print(city,state)
-        l1.append([city,state,(k/len(list(y_pred)))])
-    except:
+        # print(city,state)
+        # l1.append([city,state,(k/len(list(y_pred)))])
+        # print('eeee')
+        return [city,state,(k/len(list(y_pred)))]
+    except Exception as e:
+        print(e)
         pass
 async def first():
     await asyncio.sleep(1)
@@ -796,8 +811,10 @@ def allprice1(request):
     # x=[regression(j , i,'january') for j in d[i] for i in d]
     for i in d:
         for j in d[i]:
-            regression(j , i,request.data['month'])
-            print(i,j)
-    print(l1)
-    l1.sort(key=lambda x:x[2])
-    return JsonResponse({"buffer":l1,'flag':'True'})
+            m=regression(j , i,request.data['month'])
+            if(m):
+                x.append(m)
+            # print(i,j,m)
+    # print(l1)
+    x.sort(key=lambda x:x[2])
+    return JsonResponse({"buffer":x,'flag':'True'})
