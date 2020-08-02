@@ -28,4 +28,5 @@ urlpatterns = [
     path('mlModel/', mlModel),
     path('mlModel1/', mlModel1),
     path('mlModel2/', mlModel2),
+    path('allprice/', allprice1),
 ]

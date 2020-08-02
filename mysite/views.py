@@ -28,8 +28,8 @@ from io import StringIO
 import io
 
 d=os.path.dirname(os.getcwd())
+# d=os.path.join(d,"mysite")
 d=os.path.join(d,"app")
-# d=os.path.join(d,"app")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
@@ -199,13 +199,34 @@ def mlModel(request):
         y=dataset.iloc[:,-1].values 
 
 
+        size=y.size
+
+
+
         l=os.path.join(xn,"year")
         #j=os.path.join(l,"jan") 
         os.chdir(l)
 
-        dataset2 = pd.read_csv("jan.csv")
+        dataset2 = pd.read_csv(mnth[request.data['month']]+".csv")
         x2=dataset2.iloc[:,:-1].values
         #y2=dataset2.iloc[:,-1].values
+
+        import math
+        a=0
+        yi=0
+        for i in range(len(x)):
+            a=a+x[i][2]
+            yi=yi+x[i][3]   
+        a/=size
+        yi/=size
+
+
+
+        for i in range(len(x2)):
+            x2[i][2]=a
+            x2[i][3]=yi
+
+        x2
 
         from sklearn.preprocessing import LabelEncoder,OneHotEncoder
         from sklearn.compose import ColumnTransformer
@@ -213,31 +234,35 @@ def mlModel(request):
         label_encoder_x_1 = LabelEncoder()
         x[: , 0] = label_encoder_x_1.fit_transform(x[:,0])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [0]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x = transformer.fit_transform(x.tolist())
         x = x.astype('float64')
 
+        x
+
         label_encoder_x_2 = LabelEncoder()
-        x[: , -1] = label_encoder_x_1.fit_transform(x[:,-1])
+        x[: , 1] = label_encoder_x_1.fit_transform(x[:,1])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [-1]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x = transformer.fit_transform(x.tolist())
         x = x.astype('float64')
-        x=x[:,1:]
+
+
+        #x=x[:,1:]
 
 
 
@@ -245,31 +270,31 @@ def mlModel(request):
         label_encoder_x_2 = LabelEncoder()
         x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [0]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x2 = transformer.fit_transform(x2.tolist())
         x2 = x2.astype('float64')
 
         label_encoder_x_2 = LabelEncoder()
-        x2[: , -1] = label_encoder_x_1.fit_transform(x2[:,-1])
+        x2[: , 1] = label_encoder_x_1.fit_transform(x2[:,1])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [-1]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]             
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x2 = transformer.fit_transform(x2.tolist())
         x2 = x2.astype('float64')
-        x2=x2[:,1:]
+        #x2=x2[:,1:]
 
 
 
@@ -296,7 +321,7 @@ def mlModel(request):
             l.append(i)
         return JsonResponse({"buffer":l,"flag":'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False'},status=400)
+        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
 @api_view(['POST'])
 def mlModel1(request):
     global d,xn
@@ -318,13 +343,34 @@ def mlModel1(request):
         y=dataset.iloc[:,-1].values 
 
 
+        size=y.size
+
+
+
         l=os.path.join(xn,"year")
         #j=os.path.join(l,"jan") 
         os.chdir(l)
 
-        dataset2 = pd.read_csv("jan.csv")
+        dataset2 = pd.read_csv(mnth[request.data['month']]+".csv")
         x2=dataset2.iloc[:,:-1].values
         #y2=dataset2.iloc[:,-1].values
+
+        import math
+        a=0
+        yi=0
+        for i in range(len(x)):
+            a=a+x[i][2]
+            yi=yi+x[i][3]   
+        a/=size
+        yi/=size
+
+
+
+        for i in range(len(x2)):
+            x2[i][2]=a
+            x2[i][3]=yi
+
+        x2
 
         from sklearn.preprocessing import LabelEncoder,OneHotEncoder
         from sklearn.compose import ColumnTransformer
@@ -332,31 +378,35 @@ def mlModel1(request):
         label_encoder_x_1 = LabelEncoder()
         x[: , 0] = label_encoder_x_1.fit_transform(x[:,0])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [0]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x = transformer.fit_transform(x.tolist())
         x = x.astype('float64')
 
+        x
+
         label_encoder_x_2 = LabelEncoder()
-        x[: , -1] = label_encoder_x_1.fit_transform(x[:,-1])
+        x[: , 1] = label_encoder_x_1.fit_transform(x[:,1])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [-1]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x = transformer.fit_transform(x.tolist())
         x = x.astype('float64')
-        x=x[:,1:]
+
+
+        #x=x[:,1:]
 
 
 
@@ -364,31 +414,31 @@ def mlModel1(request):
         label_encoder_x_2 = LabelEncoder()
         x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [0]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x2 = transformer.fit_transform(x2.tolist())
         x2 = x2.astype('float64')
 
         label_encoder_x_2 = LabelEncoder()
-        x2[: , -1] = label_encoder_x_1.fit_transform(x2[:,-1])
+        x2[: , 1] = label_encoder_x_1.fit_transform(x2[:,1])
         transformer = ColumnTransformer(
-        transformers=[
-            ("OneHot",        # Just a name
-                OneHotEncoder(), # The transformer class
-                [-1]              # The column(s) to be applied on.
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]             
                 )
-        ],
-        remainder='passthrough' # donot apply anything to the remaining columns
+            ],
+            remainder='passthrough' 
         )
         x2 = transformer.fit_transform(x2.tolist())
         x2 = x2.astype('float64')
-        x2=x2[:,1:]
+        #x2=x2[:,1:]
 
 
 
@@ -400,18 +450,22 @@ def mlModel1(request):
         y_pred=regressor.predict(x2)
         #plt.plot(y2,color='red',label='real')
         #plt.plot(y_pred,color='blue',label='pred')
-        # plt.title('Cotton price') 
-        # plt.xlabel('time')
+        plt.title('Cotton price') 
+        plt.xlabel('time')
         #plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
         x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
         xi = list(range(len(x)))
+        plt.plot(xi, y_pred, marker='o', linestyle='--', color='b', label='Square') 
+        plt.xticks(xi, x)
+        plt.legend
+        plt.show()
         l=[]
         for i in y_pred:
             l.append(i)
         return JsonResponse({"buffer":l,'flag':'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False'},status=400)
+        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
 @api_view(['POST'])
 def mlModel2(request):
     global d,xn
@@ -527,4 +581,223 @@ def mlModel2(request):
             l.append(i)
         return JsonResponse({"buffer":l,'flag':'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False'},status=400)
+        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
+
+import asyncio
+l1=[]
+def regression(city,state,month):
+    try:
+        global l1
+        import matplotlib
+        matplotlib.use('Agg')
+        
+        e=os.path.join(d,state)
+        q=os.path.join(e,city.capitalize())
+        os.chdir(q)
+        mnth={'january': 'jan', 'february': 'feb', 'march': 'march', 
+            'april': 'april', 'may': 'may', 'june': 'jun', 'july': 'july', 
+            'august': 'august', 'september': 'sept', 'october': 'oct', 
+            'november': 'nov', 'december': 'dec'}
+        dataset = pd.read_csv(mnth[month]+".csv")
+        x=dataset.iloc[:,:-1].values 
+        y=dataset.iloc[:,-1].values 
+
+
+        size=y.size
+
+
+
+        l=os.path.join(xn,"year")
+        #j=os.path.join(l,"jan") 
+        os.chdir(l)
+
+        dataset2 = pd.read_csv(mnth[month]+".csv")
+        x2=dataset2.iloc[:,:-1].values
+        #y2=dataset2.iloc[:,-1].values
+
+        import math
+        a=0
+        yi=0
+        for i in range(len(x)):
+            a=a+x[i][2]
+            yi=yi+x[i][3]   
+        a/=size
+        yi/=size
+
+
+
+        for i in range(len(x2)):
+            x2[i][2]=a
+            x2[i][3]=yi
+
+        x2
+
+        from sklearn.preprocessing import LabelEncoder,OneHotEncoder
+        from sklearn.compose import ColumnTransformer
+
+        label_encoder_x_1 = LabelEncoder()
+        x[: , 0] = label_encoder_x_1.fit_transform(x[:,0])
+        transformer = ColumnTransformer(
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
+                )
+            ],
+            remainder='passthrough' 
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
+
+        x
+
+        label_encoder_x_2 = LabelEncoder()
+        x[: , 1] = label_encoder_x_1.fit_transform(x[:,1])
+        transformer = ColumnTransformer(
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]              
+                )
+            ],
+            remainder='passthrough' 
+        )
+        x = transformer.fit_transform(x.tolist())
+        x = x.astype('float64')
+
+
+        #x=x[:,1:]
+
+
+
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
+        transformer = ColumnTransformer(
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [0]              
+                )
+            ],
+            remainder='passthrough' 
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
+
+        label_encoder_x_2 = LabelEncoder()
+        x2[: , 1] = label_encoder_x_1.fit_transform(x2[:,1])
+        transformer = ColumnTransformer(
+            transformers=[
+                ("OneHot",        
+                OneHotEncoder(), 
+                [1]             
+                )
+            ],
+            remainder='passthrough' 
+        )
+        x2 = transformer.fit_transform(x2.tolist())
+        x2 = x2.astype('float64')
+        #x2=x2[:,1:]
+
+
+
+
+        from sklearn.linear_model import LinearRegression
+        regressor=LinearRegression()
+        regressor.fit(x,y)
+
+        y_pred=regressor.predict(x2)
+        #plt.plot(y2,color='red',label='real')
+        #plt.plot(y_pred,color='blue',label='pred')
+        plt.title('Cotton price') 
+        plt.xlabel('time')
+        #plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
+
+        x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
+        xi = list(range(len(x)))
+        # plt.plot(xi, y_pred, marker='o', linestyle='--', color='b', label='Square') 
+        # plt.xticks(xi, x)
+        # plt.legend
+        # plt.show()
+        # l1.append(city,state,sum(list(y_pred))/(len(y_pred)))
+        # import time
+        # print(y_pred)
+        # time.sleep(1)
+        k=0
+        for i in range(len(list(y_pred))):
+            k+=float(y_pred[i])
+        print(city,state)
+        l1.append([city,state,(k/len(list(y_pred)))])
+    except:
+        pass
+async def first():
+    await asyncio.sleep(1)
+    return "1"
+
+async def second():
+    await asyncio.sleep(1)
+    return "2"
+async def main():
+    async def one_iteration():
+        result = await first()
+        print(result)
+        result2 = await second()
+        print(result2)
+    coros = [one_iteration() for _ in range(12)]
+    await asyncio.gather(*coros)
+loop = asyncio.get_event_loop()
+loop.run_until_complete(main())
+@api_view(['POST'])
+def allprice(request):
+    global l
+    l=[]
+    async def main():
+        async def one_iteration(city,state,month):
+            await regression(city,state,month)
+        d={
+                "andhrapradesh":["Kurnool"],
+                "gujarat":["Ahmedabad","Amreli","Bhavnagar","Gandhinagar","Jamnagar","Junagarh","Kheda","Kutch","Rajkot"],
+                "haryana":["Hisar","Jind","Sirsa"],
+                "karnataka":["Bijapur","Davanagere","Dharwad","Haveri","Raichur"],
+                "madhyapradesh":["Alrajpur","Badwani","Chindwara","Dhar","Khargone"],
+                "maharashta":["Amravati","Aurangabad","Buldana","Nagpur","Nanded"],
+                "punjab":["Barnala","Bathinda","Mansa"],
+                "rajasthan":["Bhilwara","Hanumangarh","Sri Ganganagar"],
+                "tamilnadu":["Tuticorin"],
+                "telangana":["Khammam","Warangal"],
+                "up":["Hathras" ]
+            }
+        x=[]
+        x=[regression(j , i,'january') for j in d[i] for i in d]
+        await asyncio.gather(*x)
+    print('x')
+    loop = asyncio.get_event_loop()
+    loop.run_until_complete(main())
+    print(l)
+@api_view(['POST'])
+def allprice1(request):
+    global l1
+    l=[]
+    d={
+                "andhrapradesh":["Kurnool"],
+                "gujarat":["Ahmedabad","Amreli","Bhavnagar","Gandhinagar","Jamnagar","Junagarh","Kheda","Kutch","Rajkot"],
+                "haryana":["Hisar","Jind","Sirsa"],
+                "karnataka":["Bijapur","Davanagere","Dharwad","Haveri","Raichur"],
+                "madhyapradesh":["Alrajpur","Badwani","Chindwara","Dhar","Khargone"],
+                "maharashta":["Amravati","Aurangabad","Buldana","Nagpur","Nanded"],
+                "punjab":["Barnala","Bathinda","Mansa"],
+                "rajasthan":["Bhilwara","Hanumangarh","Sri Ganganagar"],
+                "tamilnadu":["Tuticorin"],
+                "telangana":["Khammam","Warangal"],
+                "up":["Hathras" ]
+            }
+    x=[]
+    # x=[regression(j , i,'january') for j in d[i] for i in d]
+    for i in d:
+        for j in d[i]:
+            regression(j , i,request.data['month'])
+            print(i,j)
+    print(l1)
+    l1.sort(key=lambda x:x[2])
+    return JsonResponse({"buffer":l1,'flag':'True'})
