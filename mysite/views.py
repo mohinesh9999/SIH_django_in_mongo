@@ -29,7 +29,7 @@ import io
 
 d=os.path.dirname(os.getcwd())
 # d=os.path.join(d,"mysite")
-d=os.path.join(d,"mysite")
+d=os.path.join(d,"app")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
