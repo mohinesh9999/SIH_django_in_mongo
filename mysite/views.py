@@ -828,7 +828,7 @@ def allprice1(request):
         for j in d[i]:
             m=regression(j , i,request.data['month'])
             # w=find_distance('gwalior',j)
-            av_price=7
+            av_price=3
             if(m):
                 m.append(av_price*find_distance(request.data['city'],j))
                 m.append(m[-1]+m[-2])
