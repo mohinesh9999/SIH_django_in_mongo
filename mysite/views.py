@@ -804,7 +804,7 @@ def allprice1(request):
     from opencage.geocoder import OpenCageGeocode
     from geopy.distance import geodesic
     def find_distance(A,B):
-        key = '710dc0082cfc492a8c90817f30efdff8'  # get api key from:  https://opencagedata.com
+        key = 'c1fedb389d6f4101aa6f45e2c8e518d2'  # get api key from:  https://opencagedata.com
         geocoder = OpenCageGeocode(key)
         
         result_A = geocoder.geocode(A)
@@ -841,3 +841,26 @@ def allprice1(request):
     x.sort(key=lambda x:x[2])
     x1.sort(key=lambda x:x[4])
     return JsonResponse({"buffer":x,"buffer1":x1,'flag':'True'})
+@api_view(['GET'])
+def allprice2(request):
+    try:
+        from opencage.geocoder import OpenCageGeocode
+        from geopy.distance import geodesic
+        def find_distance(A,B):
+            key = 'c1fedb389d6f4101aa6f45e2c8e518d2'  # get api key from:  https://opencagedata.com
+            geocoder = OpenCageGeocode(key)
+            
+            result_A = geocoder.geocode(A)
+            lat_A = result_A[0]['geometry']['lat']
+            lng_A = result_A[0]['geometry']['lng']
+            
+            result_B = geocoder.geocode(B)
+            lat_B = result_B[0]['geometry']['lat']
+            lng_B = result_B[0]['geometry']['lng']  
+        
+            return (geodesic((lat_A,lng_A), (lat_B,lng_B)).kilometers)
+        w=regression(request.data['city'],request.data['state'],request.data['month'])
+        w.append(3*find_distance(request.data['city'],request.data['tcity']))
+        return JsonResponse({"buffer":w,'w':'yo'})
+    except Exception as e:
+        return JsonResponse({"buffer":[],'e':e})
