@@ -28,8 +28,8 @@ from io import StringIO
 import io
 
 d=os.path.dirname(os.getcwd())
-# d=os.path.join(d,"mysite")
-d=os.path.join(d,"app")
+d=os.path.join(d,"mysite")
+# d=os.path.join(d,"app")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
@@ -809,12 +809,40 @@ def allprice1(request):
             }
     x=[]
     # x=[regression(j , i,'january') for j in d[i] for i in d]
+    from opencage.geocoder import OpenCageGeocode
+    from geopy.distance import geodesic
+    def find_distance(A,B):
+        key = '710dc0082cfc492a8c90817f30efdff8'  # get api key from:  https://opencagedata.com
+        geocoder = OpenCageGeocode(key)
+        
+        result_A = geocoder.geocode(A)
+        lat_A = result_A[0]['geometry']['lat']
+        lng_A = result_A[0]['geometry']['lng']
+        
+        result_B = geocoder.geocode(B)
+        lat_B = result_B[0]['geometry']['lat']
+        lng_B = result_B[0]['geometry']['lng']  
+        
+        return (geodesic((lat_A,lng_A), (lat_B,lng_B)).kilometers)
     for i in d:
         for j in d[i]:
             m=regression(j , i,request.data['month'])
+            # w=find_distance('gwalior',j)
+            av_price=7
             if(m):
+                m.append(av_price*find_distance(request.data['city'],j))
+                m.append(m[-1]+m[-2])
                 x.append(m)
-            # print(i,j,m)
+                # print()
+            # print(i,j,m)av_price
     # print(l1)
+
+     
+    # def main():
+    #     find_distance("kurukshetra","gwalior")
+    # main()
+    from copy import copy
+    x1=copy(x)
     x.sort(key=lambda x:x[2])
-    return JsonResponse({"buffer":x,'flag':'True'})
+    x1.sort(key=lambda x:x[4])
+    return JsonResponse({"buffer":x,"buffer1":x1,'flag':'True'})
