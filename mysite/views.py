@@ -28,8 +28,8 @@ from io import StringIO
 import io
 
 d=os.path.dirname(os.getcwd())
-# d=os.path.join(d,"mysite")
-d=os.path.join(d,"app")
+d=os.path.join(d,"mysite")
+# d=os.path.join(d,"app")
 d=os.path.join(d,"sih")
 xn=d
 d=os.path.join(d,"States")
@@ -830,9 +830,12 @@ def allprice1(request):
             # w=find_distance('gwalior',j)
             av_price=3
             if(m):
-                m.append(av_price*find_distance(request.data['city'],j))
-                m.append(m[-1]+m[-2])
-                x.append(m)
+                try:
+                    m.append(av_price*find_distance(request.data['city'],j))
+                    m.append(m[-1]+m[-2])
+                    x.append(m)
+                except:
+                    pass
                 # print()
             # print(i,j,m)av_price
     # print(l1)
