@@ -321,7 +321,7 @@ def mlModel(request):
             l.append(i)
         return JsonResponse({"buffer":l,"flag":'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
 @api_view(['POST'])
 def mlModel1(request):
     global d,xn
@@ -472,7 +472,7 @@ def mlModel1(request):
                 w.append(msp+0.4*(i-msp))
         return JsonResponse({"buffer":l,'w':w,'flag':'True'})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
 @api_view(['POST'])
 def mlModel2(request):
     global d,xn
@@ -593,7 +593,7 @@ def mlModel2(request):
         print(w)
         return JsonResponse({"buffer":l,'flag':'True',"x":w})
     except Exception as e:
-        return JsonResponse({"status": False,"flag":'False','e':e},status=400)
+        return JsonResponse({"status": False,"flag":'False'},status=400)
 
 import asyncio
 l1=[]
@@ -753,24 +753,11 @@ async def first():
 async def second():
     await asyncio.sleep(1)
     return "2"
-async def main():
-    async def one_iteration():
-        result = await first()
-        print(result)
-        result2 = await second()
-        print(result2)
-    coros = [one_iteration() for _ in range(12)]
-    await asyncio.gather(*coros)
-loop = asyncio.get_event_loop()
-loop.run_until_complete(main())
-@api_view(['POST'])
-def allprice(request):
-    global l
+async def main(a):
     l=[]
-    async def main():
-        async def one_iteration(city,state,month):
-            await regression(city,state,month)
-        d={
+    async def one_iteration(i,j,k):
+        l.append(await regression(i,j,k))
+    d={
                 "andhrapradesh":["Kurnool"],
                 "gujarat":["Ahmedabad","Amreli","Bhavnagar","Gandhinagar","Jamnagar","Junagarh","Kheda","Kutch","Rajkot"],
                 "haryana":["Hisar","Jind","Sirsa"],
@@ -783,13 +770,18 @@ def allprice(request):
                 "telangana":["Khammam","Warangal"],
                 "up":["Hathras" ]
             }
-        x=[]
-        x=[regression(j , i,'january') for j in d[i] for i in d]
-        await asyncio.gather(*x)
-    print('x')
+    coros=[]
+    for i in d:
+        for j in d[i]:
+            coros.append(one_iteration(j,i,'january'))
+    # coros = [one_iteration() for _ in range(12)]
+    await asyncio.gather(*coros)
+    print(coros)
+    return JsonResponse({'flag':'True'})
+@api_view(['POST'])
+def allprice(request):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    print(l)
+    loop.run_until_complete(main(request))
 @api_view(['POST'])
 def allprice1(request):
     global l1
