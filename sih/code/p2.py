@@ -78,12 +78,12 @@ label_encoder_x_2 = LabelEncoder()
 x2[: , 0] = label_encoder_x_1.fit_transform(x2[:,0])
 transformer = ColumnTransformer(
     transformers=[
-        ("OneHot",        # Just a name
-         OneHotEncoder(), # The transformer class
-         [0]              # The column(s) to be applied on.
+        ("OneHot",        
+         OneHotEncoder(), 
+         [0]              
          )
     ],
-    remainder='passthrough' # donot apply anything to the remaining columns
+    remainder='passthrough' 
 )
 x2 = transformer.fit_transform(x2.tolist())
 x2 = x2.astype('float64')
@@ -92,12 +92,12 @@ label_encoder_x_2 = LabelEncoder()
 x2[: , -1] = label_encoder_x_1.fit_transform(x2[:,-1])
 transformer = ColumnTransformer(
     transformers=[
-        ("OneHot",        # Just a name
-         OneHotEncoder(), # The transformer class
-         [-1]              # The column(s) to be applied on.
+        ("OneHot",        
+         OneHotEncoder(), 
+         [-1]             
          )
     ],
-    remainder='passthrough' # donot apply anything to the remaining columns
+    remainder='passthrough' 
 )
 x2 = transformer.fit_transform(x2.tolist())
 x2 = x2.astype('float64')
@@ -111,11 +111,8 @@ regressor=LinearRegression()
 regressor.fit(x,y)
 
 y_pred=regressor.predict(x2)
-#plt.plot(y2,color='red',label='real')
-#plt.plot(y_pred,color='blue',label='pred')
 plt.title('Cotton price') 
 plt.xlabel('time')
-#plt.xticks([0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20])
 
 x = [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20]
 xi = list(range(len(x)))
