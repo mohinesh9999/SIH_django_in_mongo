@@ -47,7 +47,7 @@ lxml==4.5.0
 MarkupSafe==1.1.1
 matplotlib==3.2.1
 missingno==0.4.2
-mistune==0.8.4
+mistune==2.0.3
 more-itertools==8.2.0
 mpl-finance==0.10.1
 mplfinance==0.12.4a0
