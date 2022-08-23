@@ -52,7 +52,7 @@ more-itertools==8.2.0
 mpl-finance==0.10.1
 mplfinance==0.12.4a0
 mysql-connector-python==8.0.16
-nbconvert==5.6.0
+nbconvert==6.5.1
 nbformat==4.4.0
 networkx==2.4
 notebook==6.0.1
